@@ -1,0 +1,16 @@
+{
+  "Project ID": "mapped:projectCode",
+  "Project Name": "mapped:projectName",
+  "Sector": "mapped:sector",
+  "Ministry": "mapped:ministry",
+  "Agency": "mapped:implementingAgency",
+  "State": "mapped:state",
+  "Original Cost": "mapped:originalCost",
+  "Anticipated Cost": "mapped:revisedCost",
+  "Cum. Exp.": "mapped:expenditure",
+  "Original DOA": "ignored",
+  "Original DOC": "mapped:originalEndDate",
+  "Anticipated DOC": "mapped:revisedEndDate",
+  "Physical Progress (%)": "mapped:physicalProgress",
+  "Source Page": "mapped:sourcePage"
+}

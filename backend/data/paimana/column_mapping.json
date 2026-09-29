@@ -1,0 +1,15 @@
+{
+  "Project Code": "mapped:projectCode",
+  "Project Name": "mapped:projectName",
+  "Sector Name": "mapped:sector",
+  "Line Ministry": "mapped:ministry",
+  "State": "mapped:state",
+  "Implementing Agency": "mapped:implementingAgency",
+  "Original Cost (Rs. Crore)": "mapped:originalCost",
+  "Revised Cost (Rs. Crore)": "mapped:revisedCost",
+  "Cumulative Expenditure (Rs. Crore)": "mapped:expenditure",
+  "Original Commissioning Date": "mapped:originalEndDate",
+  "Anticipated Commissioning Date": "mapped:revisedEndDate",
+  "Physical Progress (%)": "mapped:physicalProgress",
+  "Month & Year": "mapped:reportingMonth"
+}

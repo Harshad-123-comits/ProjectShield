@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+:root {
+  --app-bg: #FAFAFC;
+  --app-surface: #FFFFFF;
+  --app-surface-subtle: #F1F5F9;
+  --app-border: #E2E8F0;
+  --app-border-subtle: #F1F5F9;
+  --app-text: #0F172A;
+  --app-text-muted: #64748B;
+  --app-primary: #4F46E5;
+  --app-primary-hover: #4338CA;
+  --app-accent: #6366F1;
+  --app-sidebar-bg: #0F172A;
+  --app-sidebar-text: #FFFFFF;
+  --app-header-bg: #FFFFFF;
+  --app-card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 6px 16px -4px rgb(0 0 0 / 0.04);
+  --cell-py: 0.75rem;
+  --cell-px: 1rem;
+  --card-p: 1.25rem;
+}
+
+[data-theme="clarity-light"] {
+  --app-bg: #FAFAFC;
+  --app-surface: #FFFFFF;
+  --app-surface-subtle: #F4F6FB;
+  --app-border: #E2E8F0;
+  --app-border-subtle: #EEF2F6;
+  --app-text: #0F172A;
+  --app-text-muted: #64748B;
+  --app-primary: #4F46E5;
+  --app-primary-hover: #4338CA;
+  --app-accent: #6366F1;
+  --app-sidebar-bg: #0B0F19;
+  --app-sidebar-text: #FFFFFF;
+  --app-header-bg: #FFFFFF;
+  --app-card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 8px 20px -4px rgb(0 0 0 / 0.04);
+}
+
+[data-theme="clarity-dark"] {
+  --app-bg: #0A0F1D;
+  --app-surface: #111827;
+  --app-surface-subtle: #172033;
+  --app-border: #1E293B;
+  --app-border-subtle: #151E30;
+  --app-text: #F8FAFC;
+  --app-text-muted: #94A3B8;
+  --app-primary: #6366F1;
+  --app-primary-hover: #818CF8;
+  --app-accent: #38BDF8;
+  --app-sidebar-bg: #060A14;
+  --app-sidebar-text: #F8FAFC;
+  --app-header-bg: #0D1322;
+  --app-card-shadow: 0 4px 20px -2px rgb(0 0 0 / 0.5);
+}
+
+[data-theme="slate-light"] {
+  --app-bg: #F8FAFC;
+  --app-surface: #FFFFFF;
+  --app-surface-subtle: #F1F5F9;
+  --app-border: #E2E8F0;
+  --app-border-subtle: #F1F5F9;
+  --app-text: #0F172A;
+  --app-text-muted: #64748B;
+  --app-primary: #2563EB;
+  --app-primary-hover: #1D4ED8;
+  --app-accent: #3B82F6;
+  --app-sidebar-bg: #0F172A;
+  --app-sidebar-text: #FFFFFF;
+  --app-header-bg: #FFFFFF;
+  --app-card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+}
+
+[data-theme="command-dark"] {
+  --app-bg: #0B1120;
+  --app-surface: #111C33;
+  --app-surface-subtle: #192744;
+  --app-border: #1E2E4E;
+  --app-border-subtle: #192744;
+  --app-text: #F8FAFC;
+  --app-text-muted: #94A3B8;
+  --app-primary: #38BDF8;
+  --app-primary-hover: #0284C7;
+  --app-accent: #0284C7;
+  --app-sidebar-bg: #070D1A;
+  --app-sidebar-text: #F8FAFC;
+  --app-header-bg: #0E172B;
+  --app-card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+}
+
+[data-theme="bharat-navy"] {
+  --app-bg: #071326;
+  --app-surface: #0E223D;
+  --app-surface-subtle: #142D4F;
+  --app-border: #1D3B63;
+  --app-border-subtle: #153054;
+  --app-text: #FFFFFF;
+  --app-text-muted: #93C5FD;
+  --app-primary: #F59E0B;
+  --app-primary-hover: #D97706;
+  --app-accent: #10B981;
+  --app-sidebar-bg: #050E1C;
+  --app-sidebar-text: #FFFFFF;
+  --app-header-bg: #0B1C33;
+  --app-card-shadow: 0 4px 12px 0 rgb(3 10 20 / 0.4);
+}
+
+[data-theme="emerald-forest"] {
+  --app-bg: #F2F8F5;
+  --app-surface: #FFFFFF;
+  --app-surface-subtle: #E6F3EC;
+  --app-border: #CFE4D9;
+  --app-border-subtle: #E0EFE7;
+  --app-text: #064E3B;
+  --app-text-muted: #4B6B5D;
+  --app-primary: #059669;
+  --app-primary-hover: #047857;
+  --app-accent: #10B981;
+  --app-sidebar-bg: #063124;
+  --app-sidebar-text: #FFFFFF;
+  --app-header-bg: #FFFFFF;
+  --app-card-shadow: 0 1px 3px 0 rgb(6 78 59 / 0.08);
+}
+
+[data-theme="high-contrast"] {
+  --app-bg: #000000;
+  --app-surface: #121212;
+  --app-surface-subtle: #1E1E1E;
+  --app-border: #52525B;
+  --app-border-subtle: #3F3F46;
+  --app-text: #FFFFFF;
+  --app-text-muted: #D4D4D8;
+  --app-primary: #FBBF24;
+  --app-primary-hover: #F59E0B;
+  --app-accent: #F59E0B;
+  --app-sidebar-bg: #000000;
+  --app-sidebar-text: #FFFFFF;
+  --app-header-bg: #121212;
+  --app-card-shadow: none;
+}
+
+@layer base {
+  body {
+    background-color: var(--app-bg);
+    color: var(--app-text);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  
+  /* Custom sleek scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--app-border);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--app-text-muted);
+  }
+}
+
+.custom-scrollbar-dark::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar-dark::-webkit-scrollbar-track {
+  background: #0B0F17;
+}
+.custom-scrollbar-dark::-webkit-scrollbar-thumb {
+  background: #1F293D;
+  border-radius: 9999px;
+}
+.custom-scrollbar-dark::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+.font-mono-num {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Clarity Astro Aesthetic Highlights */
+.clarity-gradient-primary {
+  background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%);
+}
+
+.clarity-badge-indigo {
+  background-color: rgba(79, 70, 229, 0.08);
+  color: #4F46E5;
+  border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+.dark .clarity-badge-indigo {
+  background-color: rgba(99, 102, 241, 0.15);
+  color: #A5B4FC;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* Theme Adaptive Components */
+.theme-card {
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+
+.theme-card-subtle {
+  background-color: var(--app-surface-subtle);
+  border-color: var(--app-border-subtle);
+}
+
+.theme-header {
+  background-color: var(--app-header-bg);
+  border-color: var(--app-border);
+}
+
+.theme-sidebar {
+  background-color: var(--app-sidebar-bg);
+  color: var(--app-sidebar-text);
+}

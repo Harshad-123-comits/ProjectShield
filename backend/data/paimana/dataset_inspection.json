@@ -1,0 +1,44 @@
+{
+    "source": "Official PAIMANA MoSPI (Simulated/Extract)",
+    "downloadDate": "2026-09-28",
+    "fileName": "paimana_original.csv",
+    "format": "CSV",
+    "rows": 5,
+    "columns": [
+        "Project Code",
+        "Project Name",
+        "Sector Name",
+        "Line Ministry",
+        "State",
+        "Implementing Agency",
+        "Original Cost (Rs. Crore)",
+        "Revised Cost (Rs. Crore)",
+        "Cumulative Expenditure (Rs. Crore)",
+        "Original Commissioning Date",
+        "Anticipated Commissioning Date",
+        "Physical Progress (%)",
+        "Month & Year"
+    ],
+    "sheets": [],
+    "missingValues": {
+        "Project Code": 0,
+        "Project Name": 0,
+        "Sector Name": 0,
+        "Line Ministry": 0,
+        "State": 0,
+        "Implementing Agency": 0,
+        "Original Cost (Rs. Crore)": 0,
+        "Revised Cost (Rs. Crore)": 0,
+        "Cumulative Expenditure (Rs. Crore)": 0,
+        "Original Commissioning Date": 0,
+        "Anticipated Commissioning Date": 0,
+        "Physical Progress (%)": 0,
+        "Month & Year": 0
+    },
+    "duplicateCount": 0,
+    "fieldAnalysis": {
+        "Project Code": "Unique identifier",
+        "Sector Name": "Categorical",
+        "Original Cost (Rs. Crore)": "Numeric, in Crore"
+    }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "ProjectShield AI",
+  "description": "AI-Powered Predictive Infrastructure Project Monitoring & Early-Warning Platform for MoSPI (SIH 2026)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

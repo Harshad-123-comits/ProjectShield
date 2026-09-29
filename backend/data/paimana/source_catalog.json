@@ -1,0 +1,86 @@
+[
+  {
+    "sourceId": "DASH_2026_02",
+    "organization": "MoSPI",
+    "sourceType": "PAIMANA_DASHBOARD",
+    "title": "PAIMANA Public Dashboard Extract - Feb 2026",
+    "reportingPeriod": "2026-02",
+    "url": "https://paimana-proj.mospi.gov.in/",
+    "discoveredAt": "2026-09-28T00:00:00Z",
+    "downloadedAt": "2026-09-28T00:00:00Z",
+    "localPath": "dashboard/paimana_prototype_feb2026.csv",
+    "status": "PROCESSED"
+  },
+  {
+    "sourceId": "DASH_2026_03",
+    "organization": "MoSPI",
+    "sourceType": "PAIMANA_DASHBOARD",
+    "title": "PAIMANA Public Dashboard Extract - March 2026",
+    "reportingPeriod": "2026-03",
+    "url": "https://paimana-proj.mospi.gov.in/",
+    "discoveredAt": "2026-09-28T00:00:00Z",
+    "downloadedAt": "2026-09-28T00:00:00Z",
+    "localPath": "dashboard/paimana_march_2026.csv",
+    "status": "PROCESSED"
+  },
+  {
+    "sourceId": "DASH_2026_04",
+    "organization": "MoSPI",
+    "sourceType": "PAIMANA_DASHBOARD",
+    "title": "PAIMANA Public Dashboard Extract - April 2026",
+    "reportingPeriod": "2026-04",
+    "url": "https://paimana-proj.mospi.gov.in/",
+    "discoveredAt": "2026-09-28T00:00:00Z",
+    "downloadedAt": "2026-09-28T00:00:00Z",
+    "localPath": "dashboard/paimana_april_2026.csv",
+    "status": "PROCESSED"
+  },
+  {
+    "sourceId": "FLASH_484_2024_02",
+    "organization": "MoSPI",
+    "sourceType": "MOSPI_FLASH_REPORT",
+    "title": "484th Flash Report on Central Sector Infrastructure Projects",
+    "reportingPeriod": "2024-02",
+    "url": "https://ipm.mospi.gov.in/",
+    "discoveredAt": "2026-09-28T00:00:00Z",
+    "downloadedAt": "2026-09-28T00:00:00Z",
+    "localPath": "flash_reports/flash_report_484_annexure.csv",
+    "status": "PROCESSED"
+  },
+  {
+    "sourceId": "paimana_april_2026.csv",
+    "organization": "MoSPI",
+    "sourceType": "PAIMANA_PUBLIC_DASHBOARD",
+    "title": "paimana_april_2026.csv",
+    "localPath": "C:\\Users\\admin\\Downloads\\projectshield-ai\\backend\\data\\paimana\\raw\\dashboard\\paimana_april_2026.csv",
+    "discoveredAt": "2026-09-28T13:53:28.693Z",
+    "status": "DISCOVERED"
+  },
+  {
+    "sourceId": "paimana_march_2026.csv",
+    "organization": "MoSPI",
+    "sourceType": "PAIMANA_PUBLIC_DASHBOARD",
+    "title": "paimana_march_2026.csv",
+    "localPath": "C:\\Users\\admin\\Downloads\\projectshield-ai\\backend\\data\\paimana\\raw\\dashboard\\paimana_march_2026.csv",
+    "discoveredAt": "2026-09-28T13:53:28.699Z",
+    "status": "DISCOVERED"
+  },
+  {
+    "sourceId": "paimana_prototype_feb2026.csv",
+    "organization": "MoSPI",
+    "sourceType": "PAIMANA_PUBLIC_DASHBOARD",
+    "title": "paimana_prototype_feb2026.csv",
+    "localPath": "C:\\Users\\admin\\Downloads\\projectshield-ai\\backend\\data\\paimana\\raw\\dashboard\\paimana_prototype_feb2026.csv",
+    "discoveredAt": "2026-09-28T13:53:28.704Z",
+    "status": "DISCOVERED"
+  },
+  {
+    "sourceId": "flash_report_484_annexure.csv",
+    "organization": "MoSPI",
+    "sourceType": "MOSPI_MONTHLY_FLASH_REPORT",
+    "title": "flash_report_484_annexure.csv",
+    "localPath": "C:\\Users\\admin\\Downloads\\projectshield-ai\\backend\\data\\paimana\\raw\\flash_reports\\flash_report_484_annexure.csv",
+    "discoveredAt": "2026-09-28T13:53:28.709Z",
+    "status": "DISCOVERED"
+  }
+]
