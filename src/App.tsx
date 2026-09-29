@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavTab, Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { NotificationDrawer } from './components/layout/NotificationDrawer';
@@ -14,16 +14,16 @@ import { AiAssistantPage } from './components/assistant/AiAssistantPage';
 import { ModelPerformancePage } from './components/model/ModelPerformancePage';
 import { SettingsPage } from './components/settings/SettingsPage';
 import { LoginPage } from './components/auth/LoginPage';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ToastContainer, ToastMessage } from './components/common/Toast';
 import { GlobalFilterBar, Filters } from './components/common/GlobalFilterBar';
-import { INITIAL_ALERTS } from './data/alerts';
 import { Project, Alert, UserProfile } from './types';
 import { api } from './services/api';
 
 export function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
-  const [alerts, setAlerts] = useState<Alert[]>(INITIAL_ALERTS);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
   const [assistantInitialQuery, setAssistantInitialQuery] = useState<string | undefined>(undefined);
   
@@ -34,6 +34,20 @@ export function App() {
     status: '',
     riskLevel: ''
   });
+
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      try {
+        const res = await api.getAlerts(filters);
+        if (res.success && res.data) {
+          setAlerts(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch alerts', err);
+      }
+    };
+    fetchAlerts();
+  }, [filters]);
 
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: 'Admin',
@@ -140,6 +154,7 @@ export function App() {
         )}
 
         <main className="p-4 sm:p-6 lg:p-8 flex-1 max-w-7xl w-full mx-auto">
+            <ErrorBoundary>
           {activeTab === 'overview' && (
             <OverviewDashboard
               filters={filters}
@@ -225,7 +240,8 @@ export function App() {
           {activeTab === 'settings' && (
              <SettingsPage userProfile={userProfile} onUpdateProfile={setUserProfile} onAddToast={addToast} />
           )}
-        </main>
+                    </ErrorBoundary>
+          </main>
       </div>
     </div>
   );

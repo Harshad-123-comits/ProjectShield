@@ -67,11 +67,11 @@ export const Header: React.FC<HeaderProps> = ({
     ? projects
         .filter(
           (p) =>
-            p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.sector.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.agency.toLowerCase().includes(searchQuery.toLowerCase())
+            (p.id || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (p.state || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (p.sector || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (p.agency || '').toLowerCase().includes(searchQuery.toLowerCase())
         )
         .slice(0, 6)
     : [];

@@ -38,7 +38,8 @@ export const AnalyticsPage: React.FC<any> = ({ filters, onSelectProject, onNavig
   }
 
   const formatCr = (val: number) => {
-    if (!val) return '₹0 Cr';
+    if (val == null) return 'N/A';
+    if (val === 0) return '₹0 Cr';
     if (val >= 1000) return `₹${(val / 1000).toFixed(1)}k Cr`;
     return `₹${val.toLocaleString()} Cr`;
   };

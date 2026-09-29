@@ -40,7 +40,7 @@ export const RiskBadge: React.FC<RiskBadgeProps> = ({ level, size = 'md', id }) 
 
   return (
     <span
-      id={id || `risk-badge-${level.toLowerCase()}`}
+      id={id || `risk-badge-${(level || 'unknown').toLowerCase()}`}
       className={`inline-flex items-center rounded-lg border ${colorClasses} ${sizeClasses} whitespace-nowrap`}
     >
       <span className={`h-2 w-2 rounded-full ${dotColor}`} />
@@ -74,7 +74,7 @@ export const StatusBadge: React.FC<{ status: ProjectStatus; id?: string }> = ({ 
 
   return (
     <span
-      id={id || `status-badge-${status.toLowerCase()}`}
+      id={id || `status-badge-${(status || 'unknown').toLowerCase()}`}
       className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold border ${badgeStyle} whitespace-nowrap uppercase tracking-wider`}
     >
       {statusText}

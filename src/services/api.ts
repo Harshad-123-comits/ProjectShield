@@ -80,5 +80,10 @@ export const api = {
   async getCoverage() {
     const res = await fetch(`${API_BASE_URL}/analytics/coverage`);
     return res.json();
+  },
+  async getAlerts(filters: any = {}) {
+    const query = buildQueryString(filters);
+    const res = await fetch(`${API_BASE_URL}/alerts?${query}`);
+    return res.json();
   }
 };

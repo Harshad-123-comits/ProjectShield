@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
+import { AlertTriangle,
   FolderGit2,
   Activity,
   AlertOctagon,
@@ -56,10 +56,12 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [coverage, setCoverage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
       try {
         const [sumRes, riskRes, statusRes, topRiskRes, covRes, monthlyRes] = await Promise.all([
           api.getSummaryAnalytics(filters),
@@ -91,7 +93,8 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   }));
 
   const formatCurrencyCr = (amount: number) => {
-    if (!amount) return '₹0 Cr';
+    if (amount == null) return 'N/A';
+    if (amount === 0) return '₹0 Cr';
     if (amount >= 1000) return `₹${(amount / 1000).toFixed(2)}k Cr`;
     return `₹${amount.toLocaleString()} Cr`;
   };
@@ -159,7 +162,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <KpiCard
           id="kpi-total-projects"
           title="Total Projects"
-          value={summary.totalProjects?.toLocaleString() || '0'}
+          value={summary.totalProjects != null ? summary.totalProjects.toLocaleString() : 'N/A'}
           trend="Live"
           isPositiveTrend={true}
           comparisonLabel="Active Monitoring"
@@ -170,7 +173,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <KpiCard
           id="kpi-active-projects"
           title="Avg Progress"
-          value={`${Math.round(summary.averagePhysicalProgress || 0)}%`}
+          value={summary.averagePhysicalProgress != null ? `${Math.round(summary.averagePhysicalProgress)}%` : 'N/A'}
           trend="Overall"
           isPositiveTrend={true}
           comparisonLabel="Physical Progress"
@@ -181,7 +184,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <KpiCard
           id="kpi-high-risk-projects"
           title="High Risk Projects"
-          value={summary.highRiskProjects?.toString() || '0'}
+          value={summary.highRiskProjects != null ? summary.highRiskProjects.toString() : 'N/A'}
           trend="Attention"
           isPositiveTrend={false}
           comparisonLabel="Immediate review req."
@@ -192,7 +195,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <KpiCard
           id="kpi-delayed-projects"
           title="Delayed Projects"
-          value={summary.delayedProjects?.toString() || '0'}
+          value={summary.delayedProjects != null ? summary.delayedProjects.toString() : 'N/A'}
           trend="Behind"
           isPositiveTrend={false}
           comparisonLabel="Schedule deviation"
@@ -203,7 +206,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <KpiCard
           id="kpi-critical-alerts"
           title="Completed"
-          value={summary.completedProjects?.toString() || '0'}
+          value={summary.completedProjects != null ? summary.completedProjects.toString() : 'N/A'}
           trend="Success"
           isPositiveTrend={true}
           comparisonLabel="Successfully finished"

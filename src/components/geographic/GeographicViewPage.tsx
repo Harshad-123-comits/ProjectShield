@@ -87,7 +87,7 @@ export const GeographicViewPage: React.FC<any> = ({ filters, onSelectProject }) 
               <Map className="w-12 h-12 text-slate-400 mx-auto opacity-50" />
               <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Geospatial Map Visualization</h3>
               <p className="text-sm text-slate-500 max-w-sm">
-                Map view would render here. Connects to the State Analytics API to display choropleth layers of cost exposure and risk.
+                Geographical coordinates are not available for the current dataset.
               </p>
            </div>
         </div>

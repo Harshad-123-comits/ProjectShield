@@ -37,7 +37,7 @@ export const EarlyWarningsPage: React.FC<EarlyWarningsPageProps> = ({
     return activeAlerts.filter((a) => {
       const matchSearch =
         !searchQuery ||
-        a.projectId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (a.projectId || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         a.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         a.trigger.toLowerCase().includes(searchQuery.toLowerCase()) ||
         a.details.toLowerCase().includes(searchQuery.toLowerCase());
@@ -160,7 +160,7 @@ export const EarlyWarningsPage: React.FC<EarlyWarningsPageProps> = ({
         {filteredAlerts.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-center bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-xl p-6 text-slate-400 shadow-sm">
             <BellRing className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3" />
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No alerts match filter criteria</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No verified warnings for the current data.</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Try broadening your search or clearing filters</p>
           </div>
         ) : (
