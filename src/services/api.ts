@@ -36,6 +36,10 @@ export const api = {
   async getProject(id: string) {
     return await safeFetch(`${API_BASE_URL}/projects/${id}`);
   },
+  async getOverviewAnalytics(filters: any = {}) {
+    const query = buildQueryString(filters);
+    return await safeFetch(`${API_BASE_URL}/analytics/overview?${query}`);
+  },
   async getSummaryAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
     return await safeFetch(`${API_BASE_URL}/analytics/summary?${query}`);
@@ -46,7 +50,7 @@ export const api = {
   },
   async getStateAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    return await safeFetch(`${API_BASE_URL}/analytics/states?${query}`);
+    return await safeFetch(`${API_BASE_URL}/gis/states?${query}`); // Phase 6 Requirement
   },
   async getMinistryAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
@@ -68,6 +72,18 @@ export const api = {
     const query = buildQueryString(filters);
     return await safeFetch(`${API_BASE_URL}/analytics/risk?${query}`);
   },
+  async getRiskDrivers(filters: any = {}) {
+    const query = buildQueryString(filters);
+    return await safeFetch(`${API_BASE_URL}/analytics/risk-drivers?${query}`);
+  },
+  async getRiskByState(filters: any = {}) {
+    const query = buildQueryString(filters);
+    return await safeFetch(`${API_BASE_URL}/analytics/risk-state?${query}`);
+  },
+  async getRiskBySector(filters: any = {}) {
+    const query = buildQueryString(filters);
+    return await safeFetch(`${API_BASE_URL}/analytics/risk-sector?${query}`);
+  },
   async getHighRiskProjects(filters: any = {}) {
     const query = buildQueryString(filters);
     return await safeFetch(`${API_BASE_URL}/analytics/high-risk?${query}`);
@@ -79,6 +95,10 @@ export const api = {
   async getMonthlyAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
     return await safeFetch(`${API_BASE_URL}/analytics/monthly?${query}`);
+  },
+  async getTrendsAnalytics(filters: any = {}) {
+    const query = buildQueryString(filters);
+    return await safeFetch(`${API_BASE_URL}/analytics/trends?${query}`);
   },
   async getDataSource() {
     return await safeFetch(`${API_BASE_URL}/analytics/data-source`);

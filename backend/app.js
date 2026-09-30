@@ -17,6 +17,7 @@ const mongoose = require('mongoose');
 app.use('/api/projects', dbCheck, require('./src/routes/projects'));
 app.use('/api/analytics', dbCheck, require('./src/routes/analytics'));
 app.use('/api/alerts', dbCheck, require('./src/routes/alerts'));
+app.use('/api/gis', dbCheck, require('./src/routes/gis'));
 
 // Health check
 app.get('/api/health', (req, res) => {

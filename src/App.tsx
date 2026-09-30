@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { NavTab, Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { NotificationDrawer } from './components/layout/NotificationDrawer';
@@ -8,6 +9,8 @@ import { ProjectDetailPage } from './components/projects/ProjectDetailPage';
 import { RiskMonitorPage } from './components/risk/RiskMonitorPage';
 import { EarlyWarningsPage } from './components/alerts/EarlyWarningsPage';
 import { AnalyticsPage } from './components/analytics/AnalyticsPage';
+import { SectionNavigation } from './components/common/SectionNavigation';
+
 import { GeographicViewPage } from './components/geographic/GeographicViewPage';
 import { DataUploadPage } from './components/upload/DataUploadPage';
 import { AiAssistantPage } from './components/assistant/AiAssistantPage';
@@ -22,18 +25,47 @@ import { api } from './services/api';
 
 export function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [activeTab, setActiveTab] = useState<NavTab>('overview');
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
   const [assistantInitialQuery, setAssistantInitialQuery] = useState<string | undefined>(undefined);
   
-  const [filters, setFilters] = useState<Filters>({
-    state: '',
-    sector: '',
-    ministry: '',
-    status: '',
-    riskLevel: ''
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const filters: Filters = {
+    state: searchParams.get('state') || '',
+    sector: searchParams.get('sector') || '',
+    ministry: searchParams.get('ministry') || '',
+    status: searchParams.get('status') || '',
+    riskLevel: searchParams.get('riskLevel') || ''
+  };
+
+  const setFilters = (newFilters: Filters) => {
+    const newParams = new URLSearchParams(searchParams);
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value as string);
+      } else {
+        newParams.delete(key);
+      }
+    });
+    setSearchParams(newParams);
+  };
+
+  // Derive activeTab from pathname
+  let activeTab: NavTab = 'overview';
+  const path = location.pathname;
+  if (path.startsWith('/projects')) activeTab = 'projects';
+  else if (path.startsWith('/risk')) activeTab = 'risk';
+  else if (path.startsWith('/gis')) activeTab = 'gis';
+  
+  else if (path.startsWith('/cost')) activeTab = 'cost';
+  else if (path.startsWith('/progress')) activeTab = 'progress';
+  else if (path.startsWith('/sector')) activeTab = 'sector';
+  else if (path.startsWith('/ministry')) activeTab = 'ministry';
+  else if (path.startsWith('/trends')) activeTab = 'trends';
+  else if (path.startsWith('/settings')) activeTab = 'settings';
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -47,7 +79,7 @@ export function App() {
       }
     };
     fetchAlerts();
-  }, [filters]);
+  }, [searchParams]);
 
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: 'Admin',
@@ -84,21 +116,12 @@ export function App() {
 
   const handleSelectProject = (project: Project) => {
     setSelectedProject(project);
-    setActiveTab('projects');
+    navigate(`/projects/${project.id}?${searchParams.toString()}`);
   };
 
-  const handleSelectProjectById = async (projectId: string) => {
-    try {
-      const res = await api.getProject(projectId);
-      if (res.success) {
-        setSelectedProject(res.data);
-        setActiveTab('projects');
-      } else {
-        addToast('error', 'Error', 'Project not found');
-      }
-    } catch (err) {
-      addToast('error', 'Error', 'Failed to fetch project');
-    }
+  const handleNavigateTab = (tab: NavTab) => {
+    if (tab === 'overview') navigate(`/?${searchParams.toString()}`);
+    else navigate(`/${tab}?${searchParams.toString()}`);
   };
 
   const handleRefreshData = () => {
@@ -106,10 +129,31 @@ export function App() {
     setTimeout(() => {
       setIsRefreshing(false);
       setLastRefreshTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-      setFilters({...filters}); // Trigger re-render
+      setSearchParams(new URLSearchParams(searchParams)); // Trigger re-render
       addToast('success', 'Telemetry Refreshed', 'Latest data fetched.');
     }, 900);
   };
+
+  // Reset selectedProject when not on project detail route
+  useEffect(() => {
+    const match = location.pathname.match(/^\/projects\/([^/]+)$/);
+    if (!match && selectedProject) {
+      setSelectedProject(null);
+    } else if (match && !selectedProject) {
+      // Need to fetch project detail
+      const fetchProject = async () => {
+        try {
+          const res = await api.getProject(match[1]);
+          if (res.success) {
+            setSelectedProject(res.data);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchProject();
+    }
+  }, [location.pathname]);
 
   if (!isLoggedIn) {
     return <LoginPage onLogin={(p) => { setUserProfile(p); setIsLoggedIn(true); }} />;
@@ -117,13 +161,15 @@ export function App() {
 
   const unreadAlertsCount = alerts.filter((a) => !a.read && !a.dismissed).length;
 
+  const showGlobalFilter = !location.pathname.startsWith('/projects/') && !location.pathname.startsWith('/settings');
+
   return (
     <div className="min-h-screen bg-[var(--app-bg,#0B0F17)] text-[var(--app-text,#F8FAFC)] dark:bg-[#0B0F17] dark:text-slate-100 flex flex-col antialiased selection:bg-sky-500 selection:text-white transition-colors duration-150">
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
       <Sidebar
         activeTab={activeTab}
-        onSelectTab={(tab) => setActiveTab(tab)}
+        onTabChange={handleNavigateTab}
         unreadAlertsCount={unreadAlertsCount}
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
@@ -133,7 +179,7 @@ export function App() {
         <Header
           activeTab={activeTab}
           selectedProject={selectedProject}
-          onNavigate={(tab) => setActiveTab(tab)}
+          onNavigate={handleNavigateTab}
           onSelectProject={handleSelectProject}
           projects={[]} // No longer passing all projects
           alerts={alerts}
@@ -149,99 +195,60 @@ export function App() {
         />
         
         {/* Global Filter Bar */}
-        {(activeTab === 'overview' || activeTab === 'analytics' || activeTab === 'projects' || activeTab === 'risk-monitor' || activeTab === 'geographic') && !selectedProject && (
+        {showGlobalFilter && (
           <GlobalFilterBar filters={filters} onChange={setFilters} />
         )}
 
         <main className="p-4 sm:p-6 lg:p-8 flex-1 max-w-7xl w-full mx-auto">
-            <ErrorBoundary>
-          {activeTab === 'overview' && (
-            <OverviewDashboard
-              filters={filters}
-              projects={[]}
-              alerts={alerts}
-              onSelectProject={handleSelectProject}
-              onSelectProjectById={handleSelectProjectById}
-              onNavigate={(tab) => setActiveTab(tab)}
-              onMarkAlertAsRead={() => {}}
-              onDismissAlert={() => {}}
-            />
-          )}
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={
+                <>
+                  <OverviewDashboard filters={filters} onSelectProject={handleSelectProject} onNavigate={handleNavigateTab} />
+                  <SectionNavigation currentTab={activeTab} onNavigate={handleNavigateTab} />
+                </>
+              } />
+              
+              <Route path="/projects" element={
+                <>
+                  <ProjectTable filters={filters} onSelectProject={handleSelectProject} />
+                  <SectionNavigation currentTab={activeTab} onNavigate={handleNavigateTab} />
+                </>
+              } />
+              
+              <Route path="/projects/:id" element={
+                selectedProject && <ProjectDetailPage project={selectedProject} onBack={() => navigate(`/projects?${searchParams.toString()}`)} onAddToast={addToast} />
+              } />
 
-          {activeTab === 'projects' && (
-            selectedProject ? (
-              <ProjectDetailPage
-                project={selectedProject}
-                onBack={() => setSelectedProject(null)}
-                onAskAi={() => {}}
-                onAddToast={addToast}
-              />
-            ) : (
-              <ProjectTable
-                filters={filters}
-                onSelectProject={handleSelectProject}
-                onOpenUpload={() => setActiveTab('upload')}
-              />
-            )
-          )}
+              <Route path="/risk" element={
+                <>
+                  <RiskMonitorPage filters={filters} onSelectProject={handleSelectProject} />
+                  <SectionNavigation currentTab={activeTab} onNavigate={handleNavigateTab} />
+                </>
+              } />
 
-          {activeTab === 'analytics' && (
-            <AnalyticsPage
-              filters={filters}
-              onSelectProject={handleSelectProject}
-              onNavigate={(tab) => setActiveTab(tab)}
-            />
-          )}
+              <Route path="/gis" element={
+                <>
+                  <GeographicViewPage filters={filters} onSelectProject={handleSelectProject} />
+                  <SectionNavigation currentTab={activeTab} onNavigate={handleNavigateTab} />
+                </>
+              } />
 
-          {activeTab === 'risk-monitor' && (
-            <RiskMonitorPage
-              filters={filters}
-              onSelectProject={handleSelectProject}
-            />
-          )}
+              {['/cost', '/progress', '/sector', '/ministry', '/trends'].map(path => (
+                <Route key={path} path={path} element={
+                  <>
+                    <AnalyticsPage filters={filters} activeTab={activeTab} onSelectProject={handleSelectProject} onNavigate={handleNavigateTab} />
+                    <SectionNavigation currentTab={activeTab} onNavigate={handleNavigateTab} />
+                  </>
+                } />
+              ))}
 
-          {activeTab === 'geographic' && (
-            <GeographicViewPage
-              filters={filters}
-              onSelectProject={handleSelectProject}
-            />
-          )}
-
-          {activeTab === 'early-warnings' && (
-            <EarlyWarningsPage
-              alerts={alerts}
-              onSelectProjectById={handleSelectProjectById}
-              onMarkAsRead={() => {}}
-              onMarkAllAsRead={() => {}}
-              onDismissAlert={() => {}}
-              onAddToast={addToast}
-            />
-          )}
-
-          {activeTab === 'assistant' && (
-             <AiAssistantPage
-               projects={[]}
-               onSelectProjectById={handleSelectProjectById}
-               initialQuery={assistantInitialQuery}
-             />
-          )}
-
-          {activeTab === 'model-performance' && (
-            <ModelPerformancePage />
-          )}
-
-          {activeTab === 'upload' && (
-            <DataUploadPage
-              onIngestProjects={() => {}}
-              onAddToast={addToast}
-            />
-          )}
-          
-          {activeTab === 'settings' && (
-             <SettingsPage userProfile={userProfile} onUpdateProfile={setUserProfile} onAddToast={addToast} />
-          )}
-                    </ErrorBoundary>
-          </main>
+              <Route path="/settings" element={
+                <SettingsPage userProfile={userProfile} onUpdateProfile={setUserProfile} onAddToast={addToast} />
+              } />
+            </Routes>
+          </ErrorBoundary>
+        </main>
       </div>
     </div>
   );

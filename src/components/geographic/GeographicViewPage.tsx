@@ -1,14 +1,34 @@
-import React, { useEffect,  useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApiQuery } from '../../hooks/useApiQuery';
-import { DataSection } from '../common/DataSection';
-import { Map, List, Search, Layers, ChevronRight, AlertTriangle, IndianRupee } from 'lucide-react';
+import { Search, IndianRupee, AlertTriangle, Layers } from 'lucide-react';
 import { api } from '../../services/api';
+import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-export const GeographicViewPage: React.FC<any> = ({ filters, onSelectProject }) => {
-    const [search, setSearch] = useState('');
+export const GeographicViewPage: React.FC<any> = ({ filters }) => {
+  const [search, setSearch] = useState('');
+  const [geoData, setGeoData] = useState<any>(null);
   const queryKey = 'states-' + JSON.stringify(filters);
-  const { data: stateRes, isLoading: loading, error, refetch } = useApiQuery(queryKey, () => api.getStateAnalytics(filters));
+  const { data: stateRes, isLoading: loading } = useApiQuery(queryKey, () => api.getStateAnalytics(filters));
   const states = stateRes?.data || [];
+
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    fetch('/india_states.geojson')
+      .then(res => res.json())
+      .then(data => setGeoData(data))
+      .catch(err => console.error("Error loading GeoJSON", err));
+  }, []);
+
+  const handleStateClick = (stateName: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('state', stateName);
+    navigate(`/projects?${newParams.toString()}`);
+  };
 
   const filteredStates = (states || []).filter(s => (s.state || '').toLowerCase().includes(search.toLowerCase()));
 
@@ -19,12 +39,58 @@ export const GeographicViewPage: React.FC<any> = ({ filters, onSelectProject }) 
     return `₹${val.toLocaleString()} Cr`;
   };
 
+  const getStyle = (feature: any) => {
+    const stateName = feature.properties.NAME_1 || feature.properties.st_nm; // common properties for India GeoJSON
+    const stateData = states.find(s => s.state && stateName && s.state.toLowerCase() === stateName.toLowerCase());
+    
+    let fillColor = '#e2e8f0'; // default gray
+    if (stateData) {
+      const count = stateData.projectCount;
+      fillColor = count > 50 ? '#0369a1' :
+                  count > 20 ? '#0284c7' :
+                  count > 10 ? '#38bdf8' :
+                  count > 0  ? '#bae6fd' : '#e2e8f0';
+    }
+
+    return {
+      fillColor,
+      weight: 1,
+      opacity: 1,
+      color: 'white',
+      fillOpacity: 0.7
+    };
+  };
+
+  const onEachFeature = (feature: any, layer: L.Layer) => {
+    const stateName = feature.properties.NAME_1 || feature.properties.st_nm;
+    const stateData = states.find(s => s.state && stateName && s.state.toLowerCase() === stateName.toLowerCase());
+    
+    if (stateData) {
+      const popupContent = `
+        <div style="font-family: sans-serif; min-width: 150px; cursor: pointer;">
+          <h3 style="font-weight: bold; margin: 0 0 5px 0;">${stateData.state}</h3>
+          <div style="font-size: 12px; margin-bottom: 2px;"><b>Projects:</b> ${stateData.projectCount}</div>
+          <div style="font-size: 12px; margin-bottom: 2px;"><b>Cost:</b> ${formatCr(stateData.revisedCost)}</div>
+          <div style="font-size: 12px; margin-bottom: 0px; color: #ef4444;"><b>High Risk:</b> ${stateData.highRiskCount}</div>
+          <div style="font-size: 11px; color: #0284c7; margin-top: 5px; text-decoration: underline;">Click to view projects</div>
+        </div>
+      `;
+      layer.bindPopup(popupContent);
+      
+      layer.on({
+        click: () => {
+          handleStateClick(stateData.state);
+        }
+      });
+    }
+  };
+
   return (
     <div className="space-y-6 pb-8 h-[calc(100vh-140px)] flex flex-col">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Geographic Distribution</h2>
-          <p className="text-sm text-slate-500">State-wise infrastructure monitoring</p>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Geographic Intelligence</h2>
+          <p className="text-sm text-slate-500">Explore project concentration, financial exposure, progress, and risk across states and UTs.</p>
         </div>
       </div>
 
@@ -49,7 +115,7 @@ export const GeographicViewPage: React.FC<any> = ({ filters, onSelectProject }) 
               <div className="p-4 text-center text-slate-500">No states found</div>
             ) : (
               filteredStates.map((s, idx) => (
-                <div key={idx} className="p-3 mb-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 hover:border-sky-500/50 transition-colors cursor-pointer">
+                <div key={idx} onClick={() => handleStateClick(s.state)} className="p-3 mb-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 hover:border-sky-500/50 transition-colors cursor-pointer">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-bold text-sm text-slate-900 dark:text-white">{s.state}</h3>
                     <span className="text-xs font-mono-num font-bold bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded">{s.projectCount} Proj</span>
@@ -70,15 +136,32 @@ export const GeographicViewPage: React.FC<any> = ({ filters, onSelectProject }) 
           </div>
         </div>
         
-        <div className="lg:col-span-8 bg-slate-100 dark:bg-[#0C101A] border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center relative overflow-hidden">
-           <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
-           <div className="text-center space-y-3 z-10 p-8 bg-white/10 dark:bg-black/40 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
-              <Map className="w-12 h-12 text-slate-400 mx-auto opacity-50" />
-              <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Geospatial Map Visualization</h3>
-              <p className="text-sm text-slate-500 max-w-sm">
-                Geographical coordinates are not available for the current dataset.
-              </p>
-           </div>
+        <div className="lg:col-span-8 bg-slate-100 dark:bg-[#0C101A] border border-slate-200 dark:border-slate-800 rounded-xl relative overflow-hidden flex flex-col z-0">
+           {geoData ? (
+             <>
+               <MapContainer center={[22.5937, 78.9629]} zoom={4.5} style={{ height: '100%', width: '100%', zIndex: 1 }}>
+                 <TileLayer
+                   url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                 />
+                 <GeoJSON data={geoData} style={getStyle} onEachFeature={onEachFeature} />
+               </MapContainer>
+               <div className="absolute bottom-4 right-4 z-[400] bg-white/90 dark:bg-[#111827]/90 backdrop-blur-sm p-3 rounded-lg border border-slate-200 dark:border-slate-800 shadow-md">
+                 <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Project Concentration</div>
+                 <div className="flex flex-col gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                   <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-sm bg-[#0369a1]"></div> &gt; 50 Projects</div>
+                   <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-sm bg-[#0284c7]"></div> 21 - 50 Projects</div>
+                   <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-sm bg-[#38bdf8]"></div> 11 - 20 Projects</div>
+                   <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-sm bg-[#bae6fd]"></div> 1 - 10 Projects</div>
+                   <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-sm bg-[#e2e8f0]"></div> 0 Projects</div>
+                 </div>
+               </div>
+             </>
+           ) : (
+             <div className="flex flex-1 items-center justify-center">
+               <div className="text-slate-500">Loading map data...</div>
+             </div>
+           )}
         </div>
       </div>
     </div>

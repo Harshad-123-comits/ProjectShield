@@ -271,6 +271,57 @@ exports.getDelays = async (req, res) => {
   }
 };
 
+exports.getRiskDrivers = async (req, res) => {
+  try {
+    const match = parseFilters(req.query);
+    const drivers = await Project.aggregate([
+      { $match: match },
+      { $unwind: "$riskReasons" },
+      { $group: { _id: "$riskReasons", count: { $sum: 1 } } },
+      { $project: { _id: 0, reason: "$_id", count: 1 } },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+    res.json({ success: true, data: drivers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getRiskByState = async (req, res) => {
+  try {
+    const match = parseFilters(req.query);
+    match.riskLevel = { $in: ['HIGH', 'CRITICAL'] };
+    const states = await Project.aggregate([
+      { $match: match },
+      { $group: { _id: "$state", count: { $sum: 1 } } },
+      { $project: { _id: 0, state: "$_id", count: 1 } },
+      { $sort: { count: -1 } },
+      { $limit: 15 }
+    ]);
+    res.json({ success: true, data: states });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getRiskBySector = async (req, res) => {
+  try {
+    const match = parseFilters(req.query);
+    match.riskLevel = { $in: ['HIGH', 'CRITICAL'] };
+    const sectors = await Project.aggregate([
+      { $match: match },
+      { $group: { _id: "$sector", count: { $sum: 1 } } },
+      { $project: { _id: 0, sector: "$_id", count: 1 } },
+      { $sort: { count: -1 } },
+      { $limit: 15 }
+    ]);
+    res.json({ success: true, data: sectors });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 exports.getMonthly = async (req, res) => {
   try {
     const match = parseFilters(req.query);
@@ -287,11 +338,13 @@ exports.getMonthly = async (req, res) => {
           delayedProjects: { $sum: { $cond: [{ $eq: ['$status', 'DELAYED'] }, 1, 0] } },
           totalHighRisk: { $sum: { $cond: [{ $in: ['$riskLevel', ['HIGH', 'CRITICAL']] }, 1, 0] } },
           criticalRisk: { $sum: { $cond: [{ $eq: ['$riskLevel', 'CRITICAL'] }, 1, 0] } },
+          mediumRisk: { $sum: { $cond: [{ $eq: ['$riskLevel', 'MEDIUM'] }, 1, 0] } },
+          lowRisk: { $sum: { $cond: [{ $eq: ['$riskLevel', 'LOW'] }, 1, 0] } },
           costExposureCr: { $sum: { $cond: [{ $in: ['$riskLevel', ['HIGH', 'CRITICAL']] }, { $divide: ['$revisedCost', 1000] }, 0] } }
         }
       },
       { $match: { _id: { $ne: null } } },
-      { $project: { _id: 0, month: '$_id', projectCount: 1, originalCost: 1, revisedCost: 1, expenditure: 1, averageProgress: 1, delayedProjects: 1, totalHighRisk: 1, criticalRisk: 1, costExposureCr: 1 } },
+      { $project: { _id: 0, month: '$_id', projectCount: 1, originalCost: 1, revisedCost: 1, expenditure: 1, averageProgress: 1, delayedProjects: 1, totalHighRisk: 1, criticalRisk: 1, mediumRisk: 1, lowRisk: 1, costExposureCr: 1 } },
       { $sort: { month: 1 } }
     ]);
     

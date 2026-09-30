@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { ArrowLeft, MapPin, Building, Target, IndianRupee, Clock, AlertTriangle, MessageSquare, ShieldAlert, CheckCircle2, TrendingDown } from 'lucide-react';
+import { ArrowLeft, MapPin, Building, Target, IndianRupee, Clock, AlertTriangle, MessageSquare, ShieldAlert, CheckCircle2, TrendingDown, Home, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { Link, useSearchParams } from 'react-router-dom';
 
-export const ProjectDetailPage: React.FC<any> = ({ project, onBack, onAskAi }) => {
+export const ProjectDetailPage: React.FC<any> = ({ project, onBack }) => {
+  const [searchParams] = useSearchParams();
+  const backLink = `/projects?${searchParams.toString()}`;
+
   // Graceful fallbacks for missing data
   const progressGap = (project.plannedProgress || 0) - (project.physicalProgress || 0);
   const costEscalationCr = (project.revisedCost || 0) - (project.originalCost || 0);
@@ -20,10 +24,36 @@ export const ProjectDetailPage: React.FC<any> = ({ project, onBack, onAskAi }) =
 
   return (
     <div className="space-y-6 pb-8">
+      {/* Breadcrumbs */}
+      <nav className="flex text-sm text-slate-500 mb-4" aria-label="Breadcrumb">
+        <ol className="inline-flex items-center space-x-1 md:space-x-3">
+          <li className="inline-flex items-center">
+            <Link to={`/?${searchParams.toString()}`} className="inline-flex items-center text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-white">
+              <Home className="w-4 h-4 mr-2" />
+              Overview
+            </Link>
+          </li>
+          <li>
+            <div className="flex items-center">
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <Link to={backLink} className="ml-1 text-slate-700 hover:text-blue-600 md:ml-2 dark:text-slate-300 dark:hover:text-white">Projects</Link>
+            </div>
+          </li>
+          <li aria-current="page">
+            <div className="flex items-center">
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <span className="ml-1 text-slate-400 md:ml-2">{project.projectCode}</span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+
       {/* Header */}
       <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
-        <button onClick={onBack} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-xs font-bold mb-4"><ArrowLeft className="w-3.5 h-3.5" /> Back to Registry</button>
+        <Link to={backLink} className="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-xs font-bold mb-4">
+          <ArrowLeft className="w-3.5 h-3.5" /> Back to Registry
+        </Link>
         <div className="flex justify-between items-start">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
@@ -38,9 +68,6 @@ export const ProjectDetailPage: React.FC<any> = ({ project, onBack, onAskAi }) =
                <div className="flex items-center gap-1.5"><Target className="w-4 h-4"/>{project.sector || 'N/A'}</div>
             </div>
           </div>
-          <button onClick={() => onAskAi(`Analyze project ${project.projectCode}`)} className="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2">
-            <MessageSquare className="w-4 h-4" /> Ask AI Assistant
-          </button>
         </div>
       </div>
 

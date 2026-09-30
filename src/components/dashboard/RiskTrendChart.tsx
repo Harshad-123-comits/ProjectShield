@@ -64,7 +64,6 @@ export const RiskTrendChart: React.FC<RiskTrendChartProps> = ({ id, data = [] })
             axisLine={{ stroke: '#CBD5E1' }}
           />
           <YAxis
-            domain={[0, 200]}
             tick={{ fill: '#64748B', fontSize: 11 }}
             axisLine={{ stroke: '#CBD5E1' }}
           />
