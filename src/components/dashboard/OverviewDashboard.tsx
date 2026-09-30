@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React , { useState, useEffect } from 'react';
+import { useApiQuery } from '../../hooks/useApiQuery';
+import { DataSection } from '../common/DataSection';
 import { AlertTriangle,
   FolderGit2,
   Activity,
@@ -49,42 +51,21 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   onMarkAlertAsRead,
   onDismissAlert
 }) => {
-  const [summary, setSummary] = useState<any>({});
-  const [riskData, setRiskData] = useState<any[]>([]);
-  const [statusData, setStatusData] = useState<any[]>([]);
-  const [topRisks, setTopRisks] = useState<any[]>([]);
-  const [monthlyData, setMonthlyData] = useState<any[]>([]);
-  const [coverage, setCoverage] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+    const filterKey = JSON.stringify(filters);
+  const { data: sumRes, isLoading: sumLoading, error: sumError, refetch: refetchSum } = useApiQuery('summary-'+filterKey, () => api.getSummaryAnalytics(filters));
+  const { data: riskRes, isLoading: riskLoading, error: riskError, refetch: refetchRisk } = useApiQuery('risk-'+filterKey, () => api.getRiskAnalytics(filters));
+  const { data: statusRes, isLoading: statusLoading, error: statusError, refetch: refetchStatus } = useApiQuery('status-'+filterKey, () => api.getStatusAnalytics(filters));
+  const { data: topRiskRes, isLoading: topRiskLoading, error: topRiskError, refetch: refetchTopRisk } = useApiQuery('toprisk-'+filterKey, () => api.getHighRiskProjects(filters));
+  const { data: monthlyRes, isLoading: monthlyLoading, error: monthlyError, refetch: refetchMonthly } = useApiQuery('monthly-'+filterKey, () => api.getMonthlyAnalytics(filters));
+  const { data: covRes } = useApiQuery('coverage', () => api.getCoverage());
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [sumRes, riskRes, statusRes, topRiskRes, covRes, monthlyRes] = await Promise.all([
-          api.getSummaryAnalytics(filters),
-          api.getRiskAnalytics(filters),
-          api.getStatusAnalytics(filters),
-          api.getHighRiskProjects(filters),
-          api.getCoverage(),
-          api.getMonthlyAnalytics(filters)
-        ]);
-        setSummary(sumRes.data || {});
-        setRiskData(riskRes.data || []);
-        setStatusData(statusRes.data || []);
-        setTopRisks(topRiskRes.data ? topRiskRes.data.slice(0, 4) : []);
-        setMonthlyData(monthlyRes.data || []);
-        if (covRes) setCoverage(covRes);
-      } catch (err) {
-        console.error('Error fetching dashboard analytics:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [filters]);
+  const summary = sumRes?.data || {};
+  const riskData = riskRes?.data || [];
+  const statusData = statusRes?.data || [];
+  const topRisks = topRiskRes?.data || [];
+  const monthlyData = monthlyRes?.data || [];
+  const coverage = covRes?.data || covRes || null;
+
 
   const riskDistributionData = riskData.map(r => ({
     name: r.riskLevel,
@@ -116,9 +97,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     return null;
   };
 
-  if (loading) {
-    return <div className="p-8 text-center text-slate-500">Loading live telemetry...</div>;
-  }
+
 
   return (
     <div className="space-y-6 pb-8">
@@ -241,7 +220,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
-              <div className="h-48 relative flex items-center justify-center">
+              <div className="h-48 relative flex items-center justify-center"><DataSection isLoading={riskLoading} error={riskError} onRetry={refetchRisk}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Tooltip content={<CustomPieTooltip />} />
@@ -260,7 +239,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
-              </div>
+              </DataSection></div>
 
               {/* Breakdown List */}
               <div className="space-y-3">
@@ -321,13 +300,13 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
         {/* Right Column */}
         <div className="lg:col-span-4">
-          <AlertCenterPanel
+          <DataSection isLoading={topRiskLoading} error={topRiskError} onRetry={refetchTopRisk}><AlertCenterPanel
             alerts={alerts}
             onSelectProjectById={onSelectProjectById}
             onMarkAsRead={onMarkAlertAsRead}
             onDismissAlert={onDismissAlert}
             onViewAllAlerts={() => onNavigate('early-warnings')}
-          />
+          /></DataSection>
         </div>
       </div>
     </div>

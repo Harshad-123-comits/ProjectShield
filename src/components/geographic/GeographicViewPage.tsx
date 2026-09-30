@@ -1,31 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect,  useState } from 'react';
+import { useApiQuery } from '../../hooks/useApiQuery';
+import { DataSection } from '../common/DataSection';
 import { Map, List, Search, Layers, ChevronRight, AlertTriangle, IndianRupee } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const GeographicViewPage: React.FC<any> = ({ filters, onSelectProject }) => {
-  const [states, setStates] = useState<any[]>([]);
-  const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+  const queryKey = 'states-' + JSON.stringify(filters);
+  const { data: stateRes, isLoading: loading, error, refetch } = useApiQuery(queryKey, () => api.getStateAnalytics(filters));
+  const states = stateRes?.data || [];
 
-  useEffect(() => {
-    const fetchStates = async () => {
-      setLoading(true);
-      try {
-        const res = await api.getStateAnalytics(filters);
-        setStates(res.data || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStates();
-  }, [filters]);
-
-  const filteredStates = states.filter(s => s.state.toLowerCase().includes(search.toLowerCase()));
+  const filteredStates = (states || []).filter(s => (s.state || '').toLowerCase().includes(search.toLowerCase()));
 
   const formatCr = (val: number) => {
-    if (!val) return '₹0 Cr';
+    if (val == null) return 'N/A';
+    if (val === 0) return '₹0 Cr';
     if (val >= 1000) return `₹${(val / 1000).toFixed(1)}k Cr`;
     return `₹${val.toLocaleString()} Cr`;
   };

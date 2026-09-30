@@ -1,40 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect,  useState } from 'react';
+import { useApiQuery } from '../../hooks/useApiQuery';
+import { DataSection } from '../common/DataSection';
 import { Search, ChevronDown, ChevronUp, Download, Eye } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const ProjectTable: React.FC<any> = ({ filters, onSelectProject, onOpenUpload }) => {
-  const [projects, setProjects] = useState<any[]>([]);
-  const [page, setPage] = useState(1);
+    const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      try {
-        const queryFilters = { ...filters, q: search };
-        const res = await api.getProjects(queryFilters, page, limit);
-        if (res.success) {
-          setProjects(res.data);
-          setTotalPages(res.pagination.totalPages);
-          setTotalRecords(res.pagination.totalRecords);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    // Add debounce for search
-    const timer = setTimeout(() => {
-      fetchProjects();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [filters, page, limit, search]);
+  
+  const queryFilters = { ...filters, q: search };
+  const queryKey = 'projects-' + JSON.stringify(queryFilters) + '-' + page + '-' + limit;
+  const { data: res, isLoading: loading, error, refetch } = useApiQuery(queryKey, () => api.getProjects(queryFilters, page, limit));
+  
+  const projects = res?.data || [];
+  const totalPages = res?.pagination?.totalPages || 1;
+  const totalRecords = res?.pagination?.totalRecords || 0;
 
   return (
     <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-full">

@@ -1,41 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useApiQuery } from '../../hooks/useApiQuery';
+import { DataSection } from '../common/DataSection';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts';
 import { TrendingUp, AlertTriangle, Building2, Map, IndianRupee, Clock, ArrowRight } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const AnalyticsPage: React.FC<any> = ({ filters, onSelectProject, onNavigate }) => {
-  const [sectors, setSectors] = useState<any[]>([]);
-  const [states, setStates] = useState<any[]>([]);
-  const [ministries, setMinistries] = useState<any[]>([]);
-  const [delays, setDelays] = useState<any>({});
-  const [loading, setLoading] = useState(true);
+  const filterKey = JSON.stringify(filters);
+  const { data: secRes, isLoading: secLoading, error: secError, refetch: refetchSec } = useApiQuery('sectors-'+filterKey, () => api.getSectorAnalytics(filters));
+  const { data: stateRes, isLoading: stateLoading, error: stateError, refetch: refetchState } = useApiQuery('states-'+filterKey, () => api.getStateAnalytics(filters));
+  const { data: minRes, isLoading: minLoading, error: minError, refetch: refetchMin } = useApiQuery('ministries-'+filterKey, () => api.getMinistryAnalytics(filters));
+  const { data: delRes, isLoading: delLoading, error: delError, refetch: refetchDel } = useApiQuery('delays-'+filterKey, () => api.getDelayAnalytics(filters));
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      setLoading(true);
-      try {
-        const [secRes, stateRes, minRes, delRes] = await Promise.all([
-          api.getSectorAnalytics(filters),
-          api.getStateAnalytics(filters),
-          api.getMinistryAnalytics(filters),
-          api.getDelayAnalytics(filters)
-        ]);
-        setSectors(secRes.data || []);
-        setStates(stateRes.data || []);
-        setMinistries(minRes.data || []);
-        setDelays(delRes.data || {});
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAnalytics();
-  }, [filters]);
+  const sectors = secRes?.data || [];
+  const states = stateRes?.data || [];
+  const ministries = minRes?.data || [];
+  const delays = delRes?.data || {};
 
-  if (loading) {
-    return <div className="p-8 text-center text-slate-500">Loading analytics...</div>;
-  }
 
   const formatCr = (val: number) => {
     if (val == null) return 'N/A';
@@ -59,16 +40,20 @@ export const AnalyticsPage: React.FC<any> = ({ filters, onSelectProject, onNavig
              <Building2 className="w-5 h-5" />
              <span className="font-bold text-sm">Top Sector</span>
           </div>
-          <div className="text-lg font-bold text-slate-900 dark:text-white">{sectors[0]?.sector || 'N/A'}</div>
-          <div className="text-xs text-slate-500">{sectors[0]?.projectCount || 0} Projects</div>
+          <DataSection isLoading={secLoading} error={secError} onRetry={refetchSec} minHeight="min-h-[40px]">
+              <div className="text-lg font-bold text-slate-900 dark:text-white">{sectors[0]?.sector || 'N/A'}</div>
+              <div className="text-xs text-slate-500">{sectors[0]?.projectCount || 0} Projects</div>
+            </DataSection>
         </div>
         <div className="bg-white dark:bg-[#111827] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="flex items-center gap-3 mb-2 text-indigo-600 dark:text-indigo-400">
              <Map className="w-5 h-5" />
              <span className="font-bold text-sm">Top State</span>
           </div>
-          <div className="text-lg font-bold text-slate-900 dark:text-white">{states[0]?.state || 'N/A'}</div>
-          <div className="text-xs text-slate-500">{formatCr(states[0]?.revisedCost)} Exposure</div>
+          <DataSection isLoading={stateLoading} error={stateError} onRetry={refetchState} minHeight="min-h-[40px]">
+              <div className="text-lg font-bold text-slate-900 dark:text-white">{states[0]?.state || 'N/A'}</div>
+              <div className="text-xs text-slate-500">{formatCr(states[0]?.revisedCost)} Exposure</div>
+            </DataSection>
         </div>
         <div className="bg-white dark:bg-[#111827] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="flex items-center gap-3 mb-2 text-amber-600 dark:text-amber-400">

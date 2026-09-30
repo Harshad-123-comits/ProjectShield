@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useApiQuery } from '../../hooks/useApiQuery';
+import { DataSection } from '../common/DataSection';
 import { Target, Filter, Download, Activity, AlertTriangle } from 'lucide-react';
 import { api } from '../../services/api';
 import { CostScheduleScatter } from '../dashboard/CostScheduleScatter';
 
 export const RiskMonitorPage: React.FC<any> = ({ filters, onSelectProject }) => {
-  const [projects, setProjects] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  
   // Local sub-filters
   const [minRisk, setMinRisk] = useState(0);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      try {
-        // Fetch max 500 for the scatter plot
-        const res = await api.getProjects(filters, 1, 500);
-        setProjects(res.data || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
-  }, [filters]);
+  const queryKey = 'risk-monitor-' + JSON.stringify(filters);
+  const { data: projRes, isLoading: loading, error, refetch } = useApiQuery(queryKey, () => api.getProjects(filters, 1, 500));
+  const projects = projRes?.data || [];
 
   const filteredProjects = projects.filter(p => p.riskScore >= minRisk);
   const criticalCount = filteredProjects.filter(p => p.riskLevel === 'CRITICAL').length;

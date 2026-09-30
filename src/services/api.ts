@@ -8,82 +8,86 @@ export const buildQueryString = (filters: any) => {
   return params.toString();
 };
 
+
+const safeFetch = async (url: string) => {
+  try {
+    const res = await fetch(url);
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.message || `HTTP ${res.status}`, errorCode: data.errorCode || `HTTP_${res.status}` };
+      }
+      return data;
+    } else {
+      const text = await res.text();
+      return { success: false, message: `Unexpected response format (HTTP ${res.status})`, errorCode: 'INVALID_FORMAT' };
+    }
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Network error', errorCode: 'NETWORK_ERROR' };
+  }
+};
+
 export const api = {
   async getProjects(filters: any = {}, page = 1, limit = 20) {
     const query = buildQueryString({ ...filters, page, limit });
-    const res = await fetch(`${API_BASE_URL}/projects?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/projects?${query}`);
   },
   async getProject(id: string) {
-    const res = await fetch(`${API_BASE_URL}/projects/${id}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/projects/${id}`);
   },
   async getSummaryAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/summary?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/summary?${query}`);
   },
   async getSectorAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/sectors?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/sectors?${query}`);
   },
   async getStateAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/states?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/states?${query}`);
   },
   async getMinistryAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/ministries?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/ministries?${query}`);
   },
   async getProgressAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/progress?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/progress?${query}`);
   },
   async getCostAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/cost?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/cost?${query}`);
   },
   async getStatusAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/status?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/status?${query}`);
   },
   async getRiskAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/risk?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/risk?${query}`);
   },
   async getHighRiskProjects(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/high-risk?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/high-risk?${query}`);
   },
   async getDelayAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/delays?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/delays?${query}`);
   },
   async getMonthlyAnalytics(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/analytics/monthly?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/monthly?${query}`);
   },
   async getDataSource() {
-    const res = await fetch(`${API_BASE_URL}/analytics/data-source`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/data-source`);
   },
   async getCoverage() {
-    const res = await fetch(`${API_BASE_URL}/analytics/coverage`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/analytics/coverage`);
   },
   async getAlerts(filters: any = {}) {
     const query = buildQueryString(filters);
-    const res = await fetch(`${API_BASE_URL}/alerts?${query}`);
-    return res.json();
+    return await safeFetch(`${API_BASE_URL}/alerts?${query}`);
   }
 };
